@@ -5,8 +5,70 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Netst"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Network Speed Test" Height="500" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        MinHeight="500"
+        MinWidth="400">
+    
+    <Window.Resources>
+        <Style TargetType="RadioButton" x:Key="HeaderRadioButtonStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="OrangeRed"/>
+            
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid>
+                            <Border
+                                x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" />
+
+                            <ContentPresenter
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                RecognizesAccessKey="True" />
+                        </Grid>
+                        
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="OrangeRed"/>
+                                <Setter Property="BorderThickness" Value="0 0 0 1"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="BorderBrush" Value="OrangeRed"/>
+                                <Setter Property="BorderThickness" Value="0 0 0 2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8">
+            <RadioButton Style="{StaticResource HeaderRadioButtonStyle}" Padding="8" Margin="4 0" Click="HomeTab_OnClick" IsChecked="True">Home</RadioButton>
+            <RadioButton Style="{StaticResource HeaderRadioButtonStyle}" Padding="8" Margin="4 0" Click="NetworkTab_OnClick">Network Test</RadioButton>
+            <RadioButton Style="{StaticResource HeaderRadioButtonStyle}" Padding="8" Margin="4 0" Click="SettingsTab_OnClick">Settings</RadioButton>
+        </StackPanel>
         
+        <Frame Background="CornflowerBlue" Grid.Row="1" Source="{Binding ActiveFrame}" NavigationUIVisibility="Hidden" />
+
+        <StackPanel Grid.Row="2">
+            <Label Foreground="#cccccc">Copyright Fabian R, 2019</Label>
+        </StackPanel>
     </Grid>
 </Window>

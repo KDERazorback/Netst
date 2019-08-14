@@ -1,0 +1,130 @@
+﻿<Page x:Class="Netst.Pages.Home"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Netst.Pages"
+      xmlns:valueConverters="clr-namespace:Netst.ValueConverters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Home"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}"
+      Loaded="Home_OnLoaded">
+    
+    <Page.Resources>
+        <valueConverters:BooleanToUpDownImageConverter x:Key="BooleanToUpDownImageConverter" />
+        <valueConverters:NetworkAdapterTypeToImageConverter x:Key="NetworkAdapterTypeToImageConverter" />
+        <valueConverters:BooleanToYesNoValueConverter x:Key="BooleanToYesNoValueConverter" />
+        <valueConverters:NotNullToBooleanValueConverter x:Key="NotNullToBooleanValueConverter" />
+        <valueConverters:NetworkAdapterTypeToStringConverter x:Key="NetworkAdapterTypeToStringConverter" />
+        <valueConverters:BooleanToStringConverter x:Key="BooleanToStringConverter" />
+    </Page.Resources>
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="6*" />
+            <ColumnDefinition Width="4*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Column="0" Grid.Row="0" Margin="18" VerticalAlignment="Stretch">
+            <Label Foreground="#fc6400" FontWeight="Bold">System Information</Label>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" FontWeight="Bold">Name</Label>
+                <Label Grid.Column="0" Grid.Row="1" FontWeight="Bold">Network Domain</Label>
+                <Label Grid.Column="0" Grid.Row="2" FontWeight="Bold">CPUs</Label>
+                <Label Grid.Column="0" Grid.Row="3" FontWeight="Bold">Total Adapters</Label>
+                <ListBox Grid.Column="1" Grid.Row="4" ItemsSource="{Binding AdapterList}" MinHeight="72" MaxHeight="160" SelectedItem="{Binding SelectedAdapter, Mode=TwoWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image VerticalAlignment="Center" HorizontalAlignment="Center" Width="16" Height="16" Stretch="Uniform" Source="{Binding IsActive, Converter={StaticResource BooleanToUpDownImageConverter}}" RenderOptions.BitmapScalingMode="Fant" ToolTip="{Binding IsActive, Converter={StaticResource BooleanToStringConverter}, ConverterParameter=Interface is UP|Interface is DOWN}" />
+                                <Image VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4 0 0 0" Width="16" Height="16" Stretch="Uniform" Source="{Binding Converter={StaticResource NetworkAdapterTypeToImageConverter}}" RenderOptions.BitmapScalingMode="Fant" ToolTip="{Binding Type, Converter={StaticResource NetworkAdapterTypeToStringConverter}}" />
+                                <Label Content="{Binding Name}" />
+                                <Label> - </Label>
+                                <Label Content="{Binding SpeedString}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Label Grid.Column="1" Grid.Row="0" Content="{Binding SystemName}" />
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding DomainName}" />
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding CpuCount}" />
+                <Label Grid.Column="1" Grid.Row="3" Content="{Binding AdapterCount}" />
+            </Grid>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="0" Margin="18" VerticalAlignment="Stretch" IsEnabled="{Binding SelectedAdapter, Converter={StaticResource NotNullToBooleanValueConverter}}">
+            <Label Foreground="#fc6400" FontWeight="Bold">Adapter details</Label>
+            <Grid DataContext="{Binding SelectedAdapter}" Margin="0 0 0 16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" FontWeight="Bold">Name</Label>
+                <Label Grid.Column="0" Grid.Row="1" FontWeight="Bold">ID (handle)</Label>
+                <Label Grid.Column="0" Grid.Row="2" FontWeight="Bold">MAC Address</Label>
+                <Label Grid.Column="0" Grid.Row="3" FontWeight="Bold">Type</Label>
+                <Label Grid.Column="0" Grid.Row="4" FontWeight="Bold">Speed</Label>
+                <Label Grid.Column="0" Grid.Row="5" FontWeight="Bold">Raw Speed</Label>
+                <Label Grid.Column="0" Grid.Row="6" FontWeight="Bold">Status</Label>
+                <Label Grid.Column="0" Grid.Row="7" FontWeight="Bold">Can transmit</Label>
+                <Label Grid.Column="0" Grid.Row="8" FontWeight="Bold">Multicast</Label>
+
+                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
+                    <Image VerticalAlignment="Center" HorizontalAlignment="Center" Width="16" Height="16" Stretch="Uniform" Source="{Binding IsActive, Converter={StaticResource BooleanToUpDownImageConverter}}" RenderOptions.BitmapScalingMode="Fant" />
+                    <Image VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4 0 0 0" Width="16" Height="16" Stretch="Uniform" Source="{Binding Converter={StaticResource NetworkAdapterTypeToImageConverter}}" RenderOptions.BitmapScalingMode="Fant" />
+                    <Label Content="{Binding Name}" />
+                </StackPanel>
+                <Label Grid.Column="1" Grid.Row="1" Content="{Binding IdHandle}" Cursor="Hand" MouseUp="SelectedAdapterId_OnClick" />
+                <Label Grid.Column="1" Grid.Row="2" Content="{Binding MacAddress}" />
+                <Label Grid.Column="1" Grid.Row="3" Content="{Binding Type}" />
+                <Label Grid.Column="1" Grid.Row="4" Content="{Binding SpeedString}" />
+                <Label Grid.Column="1" Grid.Row="5" Content="{Binding Speed}" />
+                <Label Grid.Column="1" Grid.Row="6" Content="{Binding Status}" />
+                <Label Grid.Column="1" Grid.Row="7" Content="{Binding TxSupported, Converter={StaticResource BooleanToYesNoValueConverter}}" />
+                <Label Grid.Column="1" Grid.Row="8" Content="{Binding MulticastSupported, Converter={StaticResource BooleanToYesNoValueConverter}}" />
+                
+                <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="9" Margin="4 0 4 0" Click="SelectedAdapterTest_OnClick">
+                    <StackPanel Orientation="Horizontal">
+                        <Image VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4 0 0 0" Width="16" Height="16" Stretch="Uniform" Source="{Binding Converter={StaticResource NetworkAdapterTypeToImageConverter}}" RenderOptions.BitmapScalingMode="Fant" />
+                        <Label>Use this adapter</Label>
+                    </StackPanel>
+                </Button>
+            </Grid>
+            <Button Margin="4 0 4 0" Click="RefreshAdapterList_OnClick">
+                <StackPanel Orientation="Horizontal">
+                    <Image VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4 0 0 0" Width="16" Height="16" Stretch="Uniform" Source="pack://siteoforigin:,,,/Resources/reset.png" RenderOptions.BitmapScalingMode="Fant" />
+                    <Label>Refresh adapter list</Label>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Page>

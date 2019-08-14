@@ -1,0 +1,81 @@
+﻿<Page x:Class="Netst.Pages.Settings"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Netst.Pages"
+      xmlns:valueConverters="clr-namespace:Netst.ValueConverters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Settings"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}"
+      IsVisibleChanged="Settings_OnIsVisibleChanged">
+    
+    <Page.Resources>
+        <valueConverters:FloatToSpeedStringConverter x:Key="FloatToSpeedStringConverter" />
+    </Page.Resources>
+
+    <DockPanel Background="White">
+        <StackPanel DockPanel.Dock="Top" Margin="16">
+            <Label Foreground="#fc6400" FontWeight="Bold" FontSize="18">Connectivity Settings</Label>
+            <StackPanel Margin="16 16 8 16">
+                <CheckBox Margin="0 4" IsChecked="{Binding PreferUdp}" ToolTip="Using UDP connections shouls increase overall test performance, but would also be immune to packet losses.">Prefer UDP connections *</CheckBox>
+                <CheckBox IsChecked="{Binding UseTimerBasedHandling}" ToolTip="Using timers will make the app use less CPU for each client, but can introduce more latency on the test">Use Timers for writting data to the clients *</CheckBox>
+                <Label Margin="16 0 16 0" FontStyle="Italic">If unchecked, the Application will use separate threads for background TX and RX.</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label>TX Client Buffer size</Label>
+                    <ComboBox MinWidth="96" Margin="8 0" ItemsSource="{Binding AvailableBufferSizes}" SelectedItem="{Binding SelectedTxBufferSize}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <Label Content="{Binding Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=b|true}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Label>RX Client Buffer size</Label>
+                    <ComboBox MinWidth="96" Margin="8 0" ItemsSource="{Binding AvailableBufferSizes}" SelectedItem="{Binding SelectedRxBufferSize}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <Label Content="{Binding Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=b|true}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+                <CheckBox IsChecked="{Binding ThreadCpuPinning}" ToolTip="Checking this should greatly improve network performance on multi-core systems when the CPU slower than the NIC">Pin threads to individual CPUs (round-robin)</CheckBox>
+                <CheckBox IsChecked="{Binding AnnounceServer}" ToolTip="Checking this will announce this machine on the local network to other clients">Announce local server on the network</CheckBox>
+                <CheckBox IsChecked="{Binding TrackServers}" ToolTip="Checking this will listen for any remote server running on the same network, when they are announcing themselves">Listen for other servers on the network</CheckBox>
+                <CheckBox Margin="16 0 16 0"  IsChecked="{Binding ShowOwnAnnouncer}" ToolTip="Checking this will also show the local announcer on the Remote clients list">Show local announcer on the results list</CheckBox>
+            </StackPanel>
+        </StackPanel>
+        <Label DockPanel.Dock="Top" FontStyle="Italic">NOTE: Settings marked with an asterisk will be applied for new connections only.</Label>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Margin="16" Click="ApplyChanges_OnClick" Padding="16 8">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="pack://siteoforigin:,,,/Resources/checkmark.png" Width="24" RenderOptions.BitmapScalingMode="Fant" />
+                    <Label Margin="4 0 0 0">Apply changes</Label>
+                </StackPanel>
+            </Button>
+            <Button Margin="16" Click="DefaultChanges_OnClick" Padding="16 8">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="pack://siteoforigin:,,,/Resources/reset.png" Width="24" RenderOptions.BitmapScalingMode="Fant" />
+                    <Label Margin="4 0 0 0">Default settings</Label>
+                </StackPanel>
+            </Button>
+            <Button Margin="16" Click="RevertChanges_OnClick" Padding="16 8">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="pack://siteoforigin:,,,/Resources/discard.png" Width="24" RenderOptions.BitmapScalingMode="Fant" />
+                    <Label Margin="4 0 0 0">Discard changes</Label>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <Label DockPanel.Dock="Bottom" FontStyle="Italic" VerticalAlignment="Bottom">Copyright 2019 Fabian R.</Label>
+        <Label DockPanel.Dock="Bottom" FontStyle="Italic" VerticalAlignment="Bottom">
+            <TextBlock>
+                <Run>This app contains free resources from </Run>
+                <Hyperlink Click="Ionicons_OnClick">Ionicons</Hyperlink>
+                <Run> And </Run>
+                <Hyperlink Click="LoadingIo_OnClick">Loading.io</Hyperlink>
+            </TextBlock>
+        </Label>
+    </DockPanel>
+</Page>

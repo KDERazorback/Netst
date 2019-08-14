@@ -1,0 +1,252 @@
+﻿<Page x:Class="Netst.Pages.Network"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Netst.Pages"
+      xmlns:valueConverters="clr-namespace:Netst.ValueConverters"
+      xmlns:charts="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+      xmlns:liveCharts="clr-namespace:LiveCharts;assembly=LiveCharts"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Network"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}"
+      IsVisibleChanged="Page_OnIsVisibleChanged">
+
+    <Page.Resources>
+        <valueConverters:BooleanToUpDownImageConverter x:Key="BooleanToUpDownImageConverter" />
+        <valueConverters:NetworkAdapterTypeToImageConverter x:Key="NetworkAdapterTypeToImageConverter" />
+        <valueConverters:BooleanToYesNoValueConverter x:Key="BooleanToYesNoValueConverter" />
+        <valueConverters:NotNullToBooleanValueConverter x:Key="NotNullToBooleanValueConverter" />
+        <valueConverters:BooleanToStringConverter x:Key="BooleanToStringConverter" />
+        <valueConverters:FloatToSpeedStringConverter x:Key="FloatToSpeedStringConverter" />
+        <valueConverters:MbpsToMbsValueConverter x:Key="MbpsToMbsValueConverter" />
+        <valueConverters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <valueConverters:BooleanToImageConverter x:Key="BooleanToImageConverter" />
+        <valueConverters:NetworkAdapterTypeToStringConverter x:Key="NetworkAdapterTypeToStringConverter" />
+        <valueConverters:NodeAdapterTypeToImageConverter x:Key="NodeAdapterTypeToImageConverter" />
+        <valueConverters:NodeAdapterExtraParamToStringConverter x:Key="NodeAdapterExtraParamToStringConverter" />
+    </Page.Resources>
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Foreground="#fc6400" FontWeight="Bold">Selected Adapter details</Label>
+        
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" FontWeight="Bold">Name</Label>
+            <Label Grid.Column="0" Grid.Row="1" FontWeight="Bold">Max speed</Label>
+            
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" DataContext="{Binding Path=VolatileReference.SelectedTestAdapter }">
+                <Image VerticalAlignment="Center" HorizontalAlignment="Center" Width="16" Height="16" Stretch="Uniform" Source="{Binding IsActive, Converter={StaticResource BooleanToUpDownImageConverter}}" RenderOptions.BitmapScalingMode="Fant" />
+                <Image VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4 0 0 0" Width="16" Height="16" Stretch="Uniform" Source="{Binding Converter={StaticResource NetworkAdapterTypeToImageConverter}}" RenderOptions.BitmapScalingMode="Fant" ToolTip="{Binding Type, Converter={StaticResource NetworkAdapterTypeToStringConverter}}" />
+                <Label Content="{Binding Name}" MaxWidth="196" />
+            </StackPanel>
+
+            <Label Grid.Column="1" Grid.Row="1" Content="{Binding Path=VolatileReference.SelectedTestAdapter.SpeedString}" />
+            
+        </Grid>
+
+        <DockPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="16 0 16 0">
+            <Label DockPanel.Dock="Top" FontWeight="Bold" Foreground="#fc6400">Bandwidth capacity/usage (combined)</Label>
+            <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center">
+                <Label FontWeight="Bold" VerticalAlignment="Center" Content="{Binding ActiveServer.UsedBandwidth, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" />
+                <Label FontStyle="Italic" FontSize="12" VerticalAlignment="Center" Content="{Binding ActiveServer.UsedBandwidth, Converter={StaticResource MbpsToMbsValueConverter}}"/>
+            </StackPanel>
+            <ProgressBar Margin="12" Maximum="{Binding ActiveServer.Bandwidth}" Value="{Binding ActiveServer.UsedBandwidth}" />
+        </DockPanel>
+        
+        <TabControl Grid.Column="1" Grid.Row="2">
+            <TabItem Header="Gauges">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!--<charts:AngularGauge Grid.Column="0" Grid.Row="0" Margin="8 8 8 0" Value="{Binding ActiveServer.OverallTx}" ToValue="{Binding ActiveServer.Bandwidth}" />-->
+                    <!--<charts:AngularGauge Grid.Column="1" Grid.Row="0" Margin="8 8 8 0" Value="{Binding ActiveServer.OverallRx}" ToValue="{Binding ActiveServer.Bandwidth}" />-->
+
+                    <ProgressBar Grid.Column="0" Grid.Row="0" Margin="24 8 24 0" Value="{Binding ActiveServer.OverallTx}" Maximum="{Binding ActiveServer.Bandwidth}" Orientation="Vertical" Visibility="{Binding GaugesShowDetailed, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=not}" MouseUp="GaugeArea_OnMouseUp" />
+                    <ProgressBar Grid.Column="1" Grid.Row="0" Margin="24 8 24 0" Value="{Binding ActiveServer.OverallRx}" Maximum="{Binding ActiveServer.Bandwidth}" Orientation="Vertical" Visibility="{Binding GaugesShowDetailed, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=not}" MouseUp="GaugeArea_OnMouseUp" />
+
+                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="24 8 24 0" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding GaugesShowDetailed, Converter={StaticResource BooleanToVisibilityConverter}}" MouseUp="GaugeArea_OnMouseUp">
+                        <TextBlock Text="{Binding ActiveServer.OverallTx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" TextWrapping="Wrap" FontSize="38" />
+                        <Image Margin="0 24 0 0"  Source="pack://siteoforigin:,,,/Resources/up.png" Width="24" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="24 8 24 0" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding GaugesShowDetailed, Converter={StaticResource BooleanToVisibilityConverter}}" MouseUp="GaugeArea_OnMouseUp">
+                        <TextBlock Text="{Binding ActiveServer.OverallRx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" TextWrapping="Wrap" FontSize="38" />
+                        <Image Margin="0 24 0 0"  Source="pack://siteoforigin:,,,/Resources/down.png" Width="24" />
+                    </StackPanel>
+
+
+                    <Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" FontWeight="Bold">TX Rate</Label>
+                    <Label Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" FontWeight="Bold">RX Rate</Label>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Rx Chart">
+                <DockPanel>
+                    <Label DockPanel.Dock="Bottom">Data is displayed in Megabits per second (mbps)</Label>
+                    <charts:CartesianChart Margin="16" Series="{Binding ActiveServer.RxHistorySeries}" DisableAnimations="true" />
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Tx Chart">
+                <DockPanel>
+                    <Label DockPanel.Dock="Bottom">Data is displayed in Megabits per second (mbps)</Label>
+                    <charts:CartesianChart Margin="16" Series="{Binding ActiveServer.TxHistorySeries}" DisableAnimations="true" />
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Clients">
+                <ListView ItemsSource="{Binding ActiveServer.Clients}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Image Margin="4 0 8 0" DockPanel.Dock="Left" Width="16" Height="16" Source="{Binding Outgoing, Converter={StaticResource BooleanToImageConverter}, ConverterParameter=Resources/arrow-green.png|Resources/arrow-red.png}" ToolTip="{Binding Outgoing, Converter={StaticResource BooleanToStringConverter}, ConverterParameter=Outgoing connection|Incoming connection}" />
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock VerticalAlignment="Center">
+                                        <Label Content="{Binding Address}" />
+                                        <Label Margin="2 0 2 0">:</Label>
+                                        <Label Content="{Binding Protocol}" />
+                                        <Label Margin="0 0 8 0" Content="{Binding Port}" />
+                                        <Image VerticalAlignment="Center" Margin="0 0 0 4" Width="16" Height="16" Source="pack://siteoforigin:,,,/Resources/up.png" />
+                                        <Label>Tx: </Label>
+                                        <Label Content="{Binding Tx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" />
+                                        <Image VerticalAlignment="Center" Margin="0 0 0 4" Width="16" Height="16" Source="pack://siteoforigin:,,,/Resources/down.png" />
+                                        <Label>Rx: </Label>
+                                        <Label Content="{Binding Rx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" />
+                                    </TextBlock>
+                                    <Button VerticalAlignment="Center" Padding="2" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}, Mode=FindAncestor}, Path=ClientDisconnectClickHandler}" CommandParameter="{Binding}">Disconnect from Server</Button>
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Nearby Clients">
+                <DockPanel>
+                    <Label DockPanel.Dock="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="LightGray" FontWeight="Bold" Visibility="{Binding TestRunning, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=not}">The Server is not active</Label>
+                    <TextBlock Margin="8" DockPanel.Dock="Top" Visibility="{Binding TestRunning, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Image Width="16" Height="16" Source="{Binding ActiveServer.AutoDiscoveryEnabled, Converter={StaticResource BooleanToImageConverter}, ConverterParameter=Resources/checkmark.png|Resources/red.png}" />
+                        Auto Discovery of nearby clients is 
+                        <Run Text="{Binding ActiveServer.AutoDiscoveryEnabled, Converter={StaticResource BooleanToStringConverter}, ConverterParameter=enabled|disabled}"/>
+                    </TextBlock>
+                    <ListView ItemsSource="{Binding ActiveServer.DiscoveredClients}" Visibility="{Binding TestRunning, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <Image Margin="4 0 8 0" DockPanel.Dock="Left" Width="16" Height="16" Source="{Binding Converter={StaticResource NodeAdapterTypeToImageConverter}}" ToolTip="{Binding Converter={StaticResource NodeAdapterExtraParamToStringConverter}, ConverterParameter=adapter-type|The remote client is connected to the network via: \{0\}}" />
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock VerticalAlignment="Center">
+                                            <Label Content="{Binding MachineName}" ToolTip="Machine name" />
+                                            <Label Margin="2 0 2 0">(</Label>
+                                            <Label Content="{Binding DnsName}" ToolTip="DNS name" />
+                                            <Label Margin="2 0 2 0">) @ </Label>
+                                            <Label Content="{Binding Address}" ToolTip="Address of the remote machine" />
+                                            <Label Margin="2 0 2 0"> : </Label>
+                                            <Label Margin="0 0 8 0" Content="{Binding Port}" ToolTip="Remote port opened for connection" />
+                                            <Label>Protocol: </Label>
+                                            <Label Content="{Binding IsPortUdp, Converter={StaticResource BooleanToStringConverter}, ConverterParameter=UDP|TCP}" ToolTip="Protocol used on the remote machine" />
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Converter={StaticResource NodeAdapterExtraParamToStringConverter}, ConverterParameter=adapter-name}" ToolTip="Name of the remote adapter connected to the network" />
+                                        <TextBlock>
+                                            <Label Content="{Binding Converter={StaticResource NodeAdapterExtraParamToStringConverter}, ConverterParameter=adapter-mac}" ToolTip="MAC Address of the remote adapter connected to the network" />
+                                            <Label Margin="2 0 2 0"> @ </Label>
+                                            <Label Content="{Binding Converter={StaticResource NodeAdapterExtraParamToStringConverter}, ConverterParameter=adapter-speed}" ToolTip="Max speed of the remote adapter connected to the network" />
+                                        </TextBlock>
+                                        <Button VerticalAlignment="Center" Padding="2" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}, Mode=FindAncestor}, Path=NodeConnectClickHandler}" CommandParameter="{Binding}">Connect to remote client</Button>
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Server Info">
+                <DockPanel>
+                    <Label DockPanel.Dock="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Background="LightGray" FontWeight="Bold" Visibility="{Binding TestRunning, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=not}">The Server is not active</Label>
+                    <Grid Margin="24" Visibility="{Binding TestRunning, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Column="0" Grid.Row="0">IPv4 address</Label>
+                        <Label Grid.Column="0" Grid.Row="1">Port</Label>
+                        <Label Grid.Column="0" Grid.Row="2">Protocol</Label>
+                        <Label Grid.Column="0" Grid.Row="3">Started</Label>
+                        <Label Grid.Column="0" Grid.Row="4">Overall TX</Label>
+                        <Label Grid.Column="0" Grid.Row="5">Overall RX</Label>
+                        <Label Grid.Column="2" Grid.Row="0">Peak TX Rate</Label>
+                        <Label Grid.Column="2" Grid.Row="1">Peak RX Rate</Label>
+                        <Label Grid.Column="2" Grid.Row="2">Active Clients</Label>
+
+                        <Label Grid.Column="1" Grid.Row="0" Content="{Binding ActiveServer.IpAddress}" Foreground="CornflowerBlue" ToolTip="Click here to copy this IP address to the Client Connect window" MouseUp="IpLabel_OnMouseUp" />
+                        <Label Grid.Column="1" Grid.Row="1" Content="{Binding ActiveServer.Port}" />
+                        <Label Grid.Column="1" Grid.Row="2" Content="{Binding ActiveServer.ProtocolName}" />
+                        <Label Grid.Column="1" Grid.Row="3" Content="{Binding ActiveServer.IsStarted, Converter={StaticResource BooleanToStringConverter}, ConverterParameter=Yes|No}" />
+                        <Label Grid.Column="1" Grid.Row="4" Content="{Binding ActiveServer.OverallTx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" />
+                        <Label Grid.Column="1" Grid.Row="5" Content="{Binding ActiveServer.OverallRx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" />
+                        <Label Grid.Column="3" Grid.Row="0" Content="{Binding ActiveServer.PeakTx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" />
+                        <Label Grid.Column="3" Grid.Row="1" Content="{Binding ActiveServer.PeakRx, Converter={StaticResource FloatToSpeedStringConverter}, ConverterParameter=bps}" />
+                        <Label Grid.Column="3" Grid.Row="2" Content="{Binding ActiveServer.ClientCount}" />
+                    </Grid>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Column="0" Grid.Row="2">
+            <Label Foreground="#fc6400" FontWeight="Bold" Margin="0 8 0 0">Server Management</Label>
+            <DockPanel Margin="0 0 0 8">
+                <Label DockPanel.Dock="Left">Listening Port</Label>
+                <TextBox Margin="0 0 8 0" MaxLength="5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="{Binding SelectedServerPortString}" />
+            </DockPanel>
+            <Button Margin="8 0 8 0" Content="{Binding TestRunning, Converter={StaticResource BooleanToStringConverter}, ConverterParameter=Stop Server|Start Server}" Click="ServerStartStop_OnClick" />
+            
+            <Label Foreground="#fc6400" FontWeight="Bold" Margin="0 8">Client Management</Label>
+            
+            <Label>IP Address / domain name</Label>
+            <TextBox Margin="6 2" TextAlignment="Center" Text="{Binding ClientConnectAddressStr, Mode=TwoWay}" />
+
+            <Label>Port number</Label>
+            <TextBox Margin="6 2" TextAlignment="Center" Text="{Binding ClientConnectPortStr, Mode=TwoWay}" />
+            
+            <Button Margin="6" Click="ClientConnect_OnClick">Connect</Button>
+        </StackPanel>
+    </Grid>
+</Page>
